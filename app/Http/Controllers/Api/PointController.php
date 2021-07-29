@@ -12,11 +12,17 @@ class PointController extends Controller
     {
         return response()->json([
             'data' => [
-                'items' => Point::with(['points' => function($query) {
-                    $query->with('points');
+                'items' => Point::whereNull('parent')->with(['points' => function($query) {
+                    $this->recursive($query);
                 }])->get(),
             ],
         ]);
+    }
+
+    public function recursive($query) {
+        return $query->with('points', function($query) {
+            return $this->recursive($query);
+        });
     }
 
     public function store(Request $request)
