@@ -9,14 +9,15 @@ class Log extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
+    //public $timestamps = ['created_at'];
+
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'staff_id',
         'point_id',
         'access',
         'camera',
-        'timestamp',
     ];
 
     protected $casts = [

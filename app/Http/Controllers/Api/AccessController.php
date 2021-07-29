@@ -40,10 +40,9 @@ class AccessController extends Controller
             })->exists() 
             || $staff->points()
             ->where('points.id', $point->id)
-            ->whereRaw(\DB::raw('timestamp + time >'. time()))
+            ->whereRaw(\DB::raw('unix_timestamp(created_at) + time >'. time()))
             ->exists(),
             'camera' => $staff->photo, //заглушка
-            'timestamp' => time(),
         ]);
         return response()->json([
             'data' => [

@@ -43,7 +43,7 @@ class LogController extends Controller
         })
         ->with('staff')
         ->with('point')
-        ->orderBy('timestamp', 'desc')
+        ->orderBy('created_at', 'desc')
         ->get()
         ->map(function($item) {
             return [
@@ -58,7 +58,7 @@ class LogController extends Controller
                     'id' => $item->point->id,
                     'name' => $item->point->name,
                 ],
-                'timestamp' => $item->timestamp,
+                'timestamp' => strtotime($item->created_at),
             ];
         });
         return response()->json([

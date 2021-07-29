@@ -25,6 +25,6 @@ class Staff extends Model
 
     public function points()
     {
-        return $this->belongsToMany('App\Models\Point', 'staff_point');
+        return $this->belongsToMany('App\Models\Point', 'staff_accesses');
     }
 }

@@ -69,7 +69,7 @@ class StaffController extends Controller
         if($staff) {
             $staff->points()->attach($request->point_id, [
                 'time' => $request->time,
-                'timestamp' => time(),
+                'created_at' => now(),
             ]);
             return response()->noContent()->setStatusCode(201);
         }
