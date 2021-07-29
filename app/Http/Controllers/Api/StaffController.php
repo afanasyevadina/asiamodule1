@@ -12,7 +12,10 @@ class StaffController extends Controller
     {
         return response()->json([
             'data' => [
-                'items' => Staff::all(),
+                'items' => Staff::all()->map(function($item) {
+                    $item->photo = asset($item->photo);
+                    return $item;
+                }),
             ],
         ]);
     }
@@ -36,7 +39,7 @@ class StaffController extends Controller
         }
         $staff = Staff::create([
             'full_name' => $request->full_name,
-            'photo' => asset('storage/' . $request->photo->store('staff', 'public')),
+            'photo' => 'storage/' . $request->photo->store('staff', 'public'),
             'code' => \Str::random(32),
         ]);
         return response()->json([

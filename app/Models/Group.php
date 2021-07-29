@@ -22,6 +22,6 @@ class Group extends Model
 
     public function points()
     {
-        return $this->belongsToMany('App\Models\Point');
+        return $this->belongsToMany('App\Models\Point', 'group_points');
     }
 }
