@@ -47,7 +47,7 @@ class LogController extends Controller
         ->get()
         ->map(function($item) {
             return [
-                'id' => $item->id,
+                'access' => $item->access,
                 'staff' => [
                     'id' => $item->staff->id,
                     'full_name' => $item->staff->full_name,
