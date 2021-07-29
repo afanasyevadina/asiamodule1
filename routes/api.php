@@ -22,7 +22,18 @@ Route::post('/login', 'Api\AuthController@login');
 Route::post('/register', 'Api\AuthController@register'); ###
 
 Route::group(['middleware' => 'auth:api'], function() {
-    Route::post('/staffs', 'Api\StaffController@store');
+    Route::get('/staff', 'Api\StaffController@index');
+    Route::post('/staff', 'Api\StaffController@store');
+    Route::post('/staff/{id}/access', 'Api\StaffController@access');
+
+    Route::get('/points', 'Api\PointController@index');
+    Route::post('/points', 'Api\PointController@store');
+
+    Route::get('/groups', 'Api\GroupController@index');
+    Route::post('/groups', 'Api\GroupController@store');
+    Route::post('/groups/{id}/points', 'Api\GroupController@points');
+    Route::post('/groups/{id}/staff', 'Api\GroupController@staff');
+
     Route::post('/access', 'Api\AccessController@check');
     Route::get('/logs', 'Api\LogController@index'); ###
 });

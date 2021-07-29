@@ -11,8 +11,6 @@ class Staff extends Model
 
     public $timestamps = false;
 
-    protected $table = 'staffs';
-
     protected $fillable = [
         'full_name',
         'point_id',
@@ -20,8 +18,13 @@ class Staff extends Model
         'code',
     ];
 
-    public function accessGroups()
+    public function groups()
     {
-        return $this->hasMany('App\Models\AccessGroup');
+        return $this->belongsToMany('App\Models\Group');
+    }
+
+    public function points()
+    {
+        return $this->belongsToMany('App\Models\Point', 'staff_point');
     }
 }

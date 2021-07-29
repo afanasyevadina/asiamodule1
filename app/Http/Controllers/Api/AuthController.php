@@ -25,8 +25,8 @@ class AuthController extends Controller
                 ],
             ])->setStatusCode(422);
         }
-        $user = User::where('login', $request->login)->first();
-        if(!$user || !\Hash::check($request->password, $user->password)) {
+        $user = User::where('login', $request->login)->where('password', $request->password)->first();
+        if(!$user) {
             return response()->json([
                 'error' => [
                     'code' => 401,
@@ -66,7 +66,7 @@ class AuthController extends Controller
         $user = User::create([
             'full_name' => $request->full_name,
             'login' => $request->login,
-            'password' => \Hash::make($request->password),
+            'password' => $request->password,
         ]);
         $user->generateToken();
         return response()->json([

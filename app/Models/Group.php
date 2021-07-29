@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Point extends Model
+class Group extends Model
 {
     use HasFactory;
 
@@ -13,16 +13,15 @@ class Point extends Model
 
     protected $fillable = [
         'name',
-        'parent',
     ];
 
-    public function groups()
+    public function staff()
     {
-        return $this->belongsToMany('App\Models\Group');
+        return $this->belongsToMany('App\Models\Staff');
     }
 
     public function points()
     {
-        return $this->hasMany('App\Models\Point', 'parent');
+        return $this->belongsToMany('App\Models\Point');
     }
 }

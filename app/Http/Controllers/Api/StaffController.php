@@ -8,11 +8,20 @@ use App\Models\Staff;
 
 class StaffController extends Controller
 {
+    public function index()
+    {
+        return response()->json([
+            'data' => [
+                'items' => Staff::all(),
+            ],
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validator = \Validator::make($request->all(), [
             'full_name' => ['required', 'string'],
-            'photo' => ['required', 'file', 'image', 'mimes:jpeg', 'max:210'],
+            'photo' => ['required', 'file', 'image', 'mimes:jpeg'],
         ]);
         if($validator->fails()) {
             return response()->json([
@@ -37,5 +46,32 @@ class StaffController extends Controller
                 'code' => $staff->code,
             ],
         ]);
+    }
+
+    public function access(Request $request, $id)
+    {
+        $validator = \Validator::make($request->all(), [
+            'point_id' => ['required', 'exists:points,id'],
+            'time' => ['required', 'integer', 'min:0'],
+        ]);
+        if($validator->fails()) {
+            return response()->json([
+                'error' => [
+                    'code' => 422,
+                    'message' => 'Validation error',
+                    'errors' => collect($validator->errors())->map(function($item) {
+                        return $item[0];
+                    }),
+                ],
+            ])->setStatusCode(422);
+        }
+        $staff = Staff::find($id);
+        if($staff) {
+            $staff->points()->attach($request->point_id, [
+                'time' => $request->time,
+                'timestamp' => time(),
+            ]);
+            return response()->noContent()->setStatusCode(201);
+        }
     }
 }

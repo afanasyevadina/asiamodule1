@@ -13,7 +13,7 @@ class AccessController extends Controller
     public function check(Request $request)
     {
         $validator = \Validator::make($request->all(), [
-            'staff' => ['required', 'string', 'size:32', 'exists:staffs,code'],
+            'staff' => ['required', 'string', 'size:32', 'exists:staff,code'],
             'point' => ['required', 'integer', 'exists:points,id'],
         ]);
         if($validator->fails()) {
@@ -29,18 +29,25 @@ class AccessController extends Controller
         }
         $staff = Staff::where('code', $request->staff)->first();
         $point = Point::find($request->point);
-        $response = \Http::get('https://source.unsplash.com/random');
+        /*$response = \Http::get('https://source.unsplash.com/random');
         $path = 'logs/' . time() . '.jpg';
-        file_put_contents('logs/' . time() . '.jpg', $response);
+        file_put_contents('logs/' . time() . '.jpg', $response);*/
         $log = Log::create([
             'staff_id' => $staff->id,
             'point_id' => $point->id,
-            'access' => $staff->accessGroups()->where('point_id', $point->id)->exists(),
-            'photo' => asset($path),
+            'access' => $staff->groups()->whereHas('points', function($query) use($point) {
+                $query->where('points.id', $point->id)->orWhere('points.id', $point->parent);
+            })->exists() 
+            || $staff->points()
+            ->where('points.id', $point->id)
+            ->whereRaw(\DB::raw('timestamp + time >'. time()))
+            ->exists(),
+            'camera' => $staff->photo, //заглушка
+            'timestamp' => time(),
         ]);
         return response()->json([
             'data' => [
-                'photo' => $log->photo,
+                'photo' => $staff->photo,
                 'access' => $log->access,
             ],
         ]);

@@ -13,15 +13,52 @@ class LogController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $logs = Log::orderBy('created_at', 'desc')->get()->map(function($item) {
+        $validator = \Validator::make($request->all(), [
+            'type' => ['sometimes','in:staff,point'],
+        ]);
+        $validator->sometimes('id', 'required|exists:staff,id', function($input) {
+            return $input->type == 'staff';
+        });
+        $validator->sometimes('id', 'required|exists:points,id', function($input) {
+            return $input->type == 'point';
+        });
+        if($validator->fails()) {
+            return response()->json([
+                'error' => [
+                    'code' => 422,
+                    'message' => 'Validation error',
+                    'errors' => collect($validator->errors())->map(function($item) {
+                        return $item[0];
+                    }),
+                ],
+            ])->setStatusCode(422);
+        }
+        $logs = Log::when(\Request::get('type') == 'point', function($query) {
+            $query->where('point_id', \Request::get('id'));
+        })
+        ->when(\Request::get('type') == 'staff', function($query) {
+            $query->where('staff_id', \Request::get('id'));
+        })
+        ->with('staff')
+        ->with('point')
+        ->orderBy('timestamp', 'desc')
+        ->get()
+        ->map(function($item) {
             return [
-                'staff' => $item->staff->full_name,
-                'point' => $item->point->name,
-                'access' => $item->access,
-                'timestamp' => strtotime($item->created_at),
-                'photo' => $item->photo,
+                'id' => $item->id,
+                'staff' => [
+                    'id' => $item->staff->id,
+                    'full_name' => $item->staff->full_name,
+                    'photo' => $item->staff->photo,
+                    'camera' => $item->camera,
+                ],
+                'point' => [
+                    'id' => $item->point->id,
+                    'name' => $item->point->name,
+                ],
+                'timestamp' => $item->timestamp,
             ];
         });
         return response()->json([
