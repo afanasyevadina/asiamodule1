@@ -52,7 +52,7 @@ class StaffController extends Controller
     {
         $validator = \Validator::make($request->all(), [
             'point_id' => ['required', 'exists:points,id'],
-            'time' => ['required', 'integer', 'min:0'],
+            'time' => ['required', 'integer', 'min:1'],
         ]);
         if($validator->fails()) {
             return response()->json([
